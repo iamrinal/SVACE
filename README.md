@@ -1,4 +1,4 @@
-# SVACE Vulnerability Classifier with RAG and Code Generation
+# Vulnerability Classifier with RAG and Code Generation
 
 A comprehensive machine learning-based vulnerability detection and code fixing system that combines classification, retrieval-augmented generation (RAG), and multi-task learning (MCP) to analyze and fix code vulnerabilities.
 
