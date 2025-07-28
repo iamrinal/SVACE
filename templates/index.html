@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SVACE Vulnerability Detector</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f4f4;
+            padding: 40px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.15);
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 14px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+        button {
+            margin-top: 20px;
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 25px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>SVACE Vulnerability Detector using CodeBERT</h2>
+        <form method="POST">
+            <label for="code">Enter Code Snippet:</label><br>
+            <textarea name="code" placeholder="Paste your code here..." required>{{ code if code else '' }}</textarea><br>
+            <label for="flag">Select Issue Type:</label><br>
+            <select name="flag" required>
+                <option value="Null dereference" {% if flag == 'Null dereference' %}selected{% endif %}>Null dereference</option>
+                <option value="Allocation mismatches" {% if flag == 'Allocation mismatches' %}selected{% endif %}>Allocation mismatches</option>
+                <option value="Invalid comparisons" {% if flag == 'Invalid comparisons' %}selected{% endif %}>Invalid comparisons</option>
+            </select><br>
+            <button type="submit">Analyze</button>
+        </form>
+
+        {% if prediction %}
+            <div class="result" style="margin-top:30px; padding:20px; background:#f9f9f9; border-radius:10px; box-shadow:0 2px 8px #eee;">
+                <h3>Classification: <span style="color: {{ 'red' if prediction == 'Confirmed' else 'green' }}">{{ prediction }}</span></h3>
+                {% if confidence is not none %}
+                <div>Confidence: <b>{{ confidence | round(4) }}</b></div>
+                {% endif %}
+                <div style="margin-top:20px;">
+                    <b>Suggested Code Fix:</b>
+                    <pre style="background:#f8f8f8; border-radius:6px; padding:14px; font-size:16px;">{{ fix }}</pre>
+                </div>
+                {% if retrieved and retrieved|length > 0 %}
+                <details style="margin-top:20px;">
+                    <summary style="font-weight:bold; cursor:pointer;">Show Similar Examples</summary>
+                    <ul style="margin-top:10px;">
+                    {% for ex in retrieved %}
+                        <li style="margin-bottom:18px;">
+                            <b>Flag:</b> {{ ex.flag }}<br>
+                            <b>Buggy Code:</b>
+                            <pre style="background:#f0f0f0; display:inline-block; padding:8px; border-radius:4px;">{{ ex.code_with_bug }}</pre><br>
+                            <b>Fix:</b>
+                            <pre style="background:#f0f0f0; display:inline-block; padding:8px; border-radius:4px;">{{ ex.fixed_code }}</pre>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                </details>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
